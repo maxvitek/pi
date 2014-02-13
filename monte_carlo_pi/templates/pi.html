@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monte Carlo Pi Estimator</title>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+</head>
+<body>
+    <script>
+        var bodySelection = d3.select("body");
+
+        var svgSelection = bodySelection.append("svg")
+                .attr("width", 500)
+                .attr("height", 500);
+
+        var piText = bodySelection.append("p")
+                .attr("x", 0)
+                .attr("y", 250)
+                .text('')
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "20px")
+                .attr("fill","black");
+
+        var rectSelection = svgSelection.append("rect")
+                .attr("width", 500)
+                .attr("height", 500)
+                .style("fill", "none")
+                .style("stroke", "black")
+                .style("stroke-width", "border");
+
+        var circleSelection = svgSelection.append("circle")
+                .attr("r", 250)
+                .attr("cx", 250)
+                .attr("cy", 250)
+                .style("fill", "none")
+                .style("stroke", "black")
+                .style("stroke-width", "border");
+
+        var pointsIn = 0;
+
+        var pointsOut = 0;
+
+        var pi = 0;
+
+        var color = "none";
+
+        function monteCarloPi()
+        {
+            var xCoord = Math.random();
+            var yCoord = Math.random();
+            var dist = Math.sqrt(
+                    Math.pow(xCoord - 0.5, 2) + Math.pow(yCoord - 0.5, 2)
+            );
+
+            if (dist <= 0.5) {
+                pointsIn += 1;
+                color = "red";
+            }
+
+            if (dist > 0.5) {
+                pointsOut += 1;
+                color = "blue";
+            }
+
+            pi = 4 * pointsIn / (pointsIn + pointsOut);
+
+            d3.select("p").text(pi.toString());
+
+            svgSelection.append("circle")
+                .attr("r", 1)
+                .attr("cx", xCoord * 500)
+                .attr("cy", yCoord * 500)
+                .style("fill", color);
+
+        }
+
+        setInterval(monteCarloPi, 0)
+
+    </script>
+</body>
+</html>
