@@ -1,10 +1,21 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <html>
 <head>
+    <style>
+        @import url(//fonts.googleapis.com/css?family=Yanone+Kaffeesatz:400,700);
+    </style>
+    <link href="{% static "style.css" %}" rel="stylesheet" type="text/css">
     <title>Monte Carlo Pi Estimator</title>
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="{% static "d3.v2.js" %}" charset="utf-8"></script>
+    <script src="{% static "cubism.v1.js" %}" charset="utf-8"></script>
+    <script src="{% static "highlight.js" %}" charset="utf-8"></script>
 </head>
 <body>
+    <h2>A Monte Carlo Estimation of Pi</h2>
+    <p>If a circle is inscribed in a square, the ratio of their areas is &pi; / 4.
+    This means that we can choose random points and estimate &pi; by counting the
+    ones inside the circle, dividing by the total number of points, and multiplying by four.</p>
     <script>
         var bodySelection = d3.select("body");
 
@@ -12,13 +23,7 @@
                 .attr("width", 500)
                 .attr("height", 500);
 
-        var piText = bodySelection.append("p")
-                .attr("x", 0)
-                .attr("y", 250)
-                .text('')
-                .attr("font-family", "sans-serif")
-                .attr("font-size", "20px")
-                .attr("fill","black");
+        var piTS = bodySelection.append("div")
 
         var rectSelection = svgSelection.append("rect")
                 .attr("width", 500)
@@ -43,6 +48,26 @@
 
         var color = "none";
 
+        var piEstimates = [];
+
+        var context = cubism.context()
+            .serverDelay(0)
+            .clientDelay(0)
+            .step(20)
+            .size(500);
+
+        var counter = 0;
+
+        while (counter < context.size) {
+            counter += 1;
+            piEstimates.append(0);
+        }
+
+        var piMetric = context.metric(function(start, stop, step, callback) {
+            start = +start, stop = +stop;
+            callback(null, piEstimates = piEstimates.slice((start - stop) / step));
+          }, "Pi Estimate");
+
         function monteCarloPi()
         {
             var xCoord = Math.random();
@@ -63,7 +88,7 @@
 
             pi = 4 * pointsIn / (pointsIn + pointsOut);
 
-            d3.select("p").text(pi.toString());
+            piEstimates.push(pi)
 
             svgSelection.append("circle")
                 .attr("r", 1)
@@ -74,6 +99,32 @@
         }
 
         setInterval(monteCarloPi, 0)
+
+        piTS.call(function(div) {
+
+          div.append("div")
+              .attr("class", "axis")
+              .call(context.axis().orient("top"));
+
+          div.selectAll(".horizon")
+              .data([piMetric])
+              .enter().append("div")
+              .attr("class", "horizon")
+              .call(context.horizon()
+                          .extent([3.5, 4.1])
+                          .format(d3.format(".6s"))
+                          .scale(d3.scale.pow().exponent(4)));
+
+          div.append("div")
+              .attr("class", "rule")
+              .call(context.rule());
+
+        });
+
+        context.on("focus", function(i) {
+          d3.selectAll(".value").style("right", i == null ? null : context.size() - i + "px");
+        });
+
 
     </script>
 </body>
