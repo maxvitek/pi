@@ -16,25 +16,27 @@
     This means that we can randomly choose points from the interior of the square and <a href="http://en.wikipedia.org/wiki/Approximations_of_π">estimate &pi;</a> by counting the
     ones that happen to be inside the circle (and then dividing by the total number of points, and multiplying the result by four).</p>
     <script>
+        var square_side_length = 500;
+
         var bodySelection = d3.select("body");
 
         var svgSelection = bodySelection.append("svg")
-                .attr("width", 500)
-                .attr("height", 500);
+                .attr("width", square_side_length)
+                .attr("height", square_side_length);
 
         var piTS = bodySelection.append("div")
 
         var rectSelection = svgSelection.append("rect")
-                .attr("width", 500)
-                .attr("height", 500)
+                .attr("width", square_side_length)
+                .attr("height", square_side_length)
                 .style("fill", "none")
                 .style("stroke", "black")
                 .style("stroke-width", "border");
 
         var circleSelection = svgSelection.append("circle")
-                .attr("r", 250)
-                .attr("cx", 250)
-                .attr("cy", 250)
+                .attr("r", square_side_length / 2)
+                .attr("cx", square_side_length / 2)
+                .attr("cy", square_side_length / 2)
                 .style("fill", "none")
                 .style("stroke", "black")
                 .style("stroke-width", "border");
@@ -53,7 +55,7 @@
             .serverDelay(0)
             .clientDelay(0)
             .step(20)
-            .size(500);
+            .size(square_side_length);
 
         var counter = 0;
 
@@ -91,8 +93,8 @@
 
             svgSelection.append("circle")
                 .attr("r", 1)
-                .attr("cx", xCoord * 500)
-                .attr("cy", yCoord * 500)
+                .attr("cx", xCoord * square_side_length)
+                .attr("cy", yCoord * square_side_length)
                 .style("fill", color);
 
         }
